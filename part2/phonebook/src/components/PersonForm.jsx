@@ -1,9 +1,13 @@
+import axios from "axios";
+
 const PersonForm = ({newName, setNewName, newNumber, setNewNumber, persons, setPersons}) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         if (persons.find((person) => person.name.toLowerCase() === newName.toLowerCase()))
           return window.alert(`${newName} is already added to phonebook`)
-        setPersons(persons.concat({name: newName, number: newNumber}));
+
+        axios.post('http://localhost:3001/persons', {name: newName, number: newNumber})
+        .then((response) => setPersons(persons.concat({name: newName, number: newNumber})))
       }
     
     return (
