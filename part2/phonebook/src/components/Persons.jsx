@@ -1,5 +1,5 @@
 const Persons = ({persons}) => {
-    return persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
+    return persons.map(person => <p key={person.id}>{person.name} {person.number}</p>)
 }
 
 export default Persons;
