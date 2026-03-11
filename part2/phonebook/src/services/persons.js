@@ -12,9 +12,14 @@ const addPerson = async (newName, newNumber) => {
     .then((response) => response.data)
 }
 
+const updatePerson = async (id, newData) => {
+    return axios.put(`${baseUrl}/${id}`, newData)
+    .then((response) => response.data)
+}
+
 const deletePerson = async(id) => {
     return axios.delete(`${baseUrl}/${id}`)
     .then((response) => response.data)
 }
 
-export default {getPersons, addPerson, deletePerson}
+export default {getPersons, addPerson, updatePerson, deletePerson}

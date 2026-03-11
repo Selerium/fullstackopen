@@ -19,6 +19,11 @@
       "id": "5166",
       "name": "Milkh Sheikh",
       "number": "80080808808"
+    },
+    {
+      "id": "2da1",
+      "name": "Hi There",
+      "number": "0802"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

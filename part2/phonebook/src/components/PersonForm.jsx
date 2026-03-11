@@ -4,10 +4,20 @@ const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, set
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (newName === '' || newNumber === '')
-            return ;
+            return;
 
-        if (persons.find((person) => person.name.toLowerCase() === newName.toLowerCase()))
-            return window.alert(`${newName} is already added to phonebook`)
+        const checkPhonebook = persons.find((person) => person.name.toLowerCase() === newName.toLowerCase())
+        if (checkPhonebook) {
+            if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`))
+                return;
+            await personsService.updatePerson(checkPhonebook.id, { ...checkPhonebook, number: newNumber })
+                .then((data) => {
+                    const personsCopy = persons.filter(person => person.id !== data.id)
+                    setPersons(personsCopy.concat(data))
+                })
+            return;
+        }
+
 
         await personsService.addPerson(newName, newNumber)
             .then((data) => setPersons(persons.concat(data)))
