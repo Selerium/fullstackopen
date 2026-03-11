@@ -13,6 +13,7 @@ const App = () => {
   ]
 
   const [votes, setVotes] = useState([])
+  const [highest, setHighest] = useState(0)
   const [selected, setSelected] = useState(0)
 
   return (
@@ -20,11 +21,15 @@ const App = () => {
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected] ?? 0} votes</p>
       <button onClick={() => {
-        const copy = [...votes];
+        const copy = [...votes]
         copy[selected] = (copy[selected] ?? 0) + 1;
+        if (copy[selected] > votes[highest]) setHighest(selected);
         setVotes(copy)
       }}>vote</button>
       <button onClick={() => setSelected(Math.trunc(Math.random() * 10) % anecdotes.length)}>next anecdote</button>
+      <h1>Anecdote with most votes</h1>
+      <p>{anecdotes[highest]}</p>
+      <p>has {votes[highest] ?? 0} votes</p>
     </div>
   )
 }
