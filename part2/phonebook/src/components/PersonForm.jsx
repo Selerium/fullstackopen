@@ -1,13 +1,16 @@
 import personsService from "../services/persons";
 
 const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons }) => {
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        if (newName === '' || newNumber === '')
+            return ;
+
         if (persons.find((person) => person.name.toLowerCase() === newName.toLowerCase()))
             return window.alert(`${newName} is already added to phonebook`)
 
-        personsService.addPerson({ name: newName, number: newNumber })
-            .then((data) => setPersons(persons.concat({ name: newName, number: newNumber })))
+        await personsService.addPerson(newName, newNumber)
+            .then((data) => setPersons(persons.concat(data)))
     }
 
     return (
