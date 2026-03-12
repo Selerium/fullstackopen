@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 3001;
 
-const phonebook = [
+let phonebook = [
   {
     id: "1",
     name: "Arto Hellas",
@@ -35,6 +35,12 @@ app.get("/api/persons/:id", (request, response) => {
     response.statusMessage = 'Record not found';
     response.status(404).send();
   }
+})
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  phonebook = phonebook.filter(record => record.id !== id)
+  response.status(204).send()
 })
 
 app.get("/info", (request, response) => {
