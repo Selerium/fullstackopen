@@ -27,6 +27,16 @@ const phonebook = [
 
 app.get("/api/persons", (request, response) => response.json(phonebook));
 
+app.get("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  const record = phonebook.find(item => item.id === id)
+  if (record) response.json(record);
+  else {
+    response.statusMessage = 'Record not found';
+    response.status(404).send();
+  }
+})
+
 app.get("/info", (request, response) => {
   const date = new Date()  
   response.send(`\
