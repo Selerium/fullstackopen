@@ -29,36 +29,45 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-app.use(express.json())
+app.use(express.json());
 
 app.get("/api/persons", (request, response) => response.json(phonebook));
 
 app.post("/api/persons", (request, response) => {
-  const record = request.body
-  record['id'] = getRandomInt(1000000)
-  phonebook = phonebook.concat(record)
+  const record = request.body;
 
-  response.send(record)
-})
+  if (!record["name"] || !record["number"]) {
+    response.json({ error: "incomplete fields sent" });
+  }
+  else if (phonebook.find((list) => list.name === record["name"])) {
+    response.json({ error: "name must be a unique value" });
+  }
+  else {
+    record["id"] = getRandomInt(1000000);
+    phonebook = phonebook.concat(record);
+  
+    response.send(record);
+  }
+});
 
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const record = phonebook.find(item => item.id === id)
+  const record = phonebook.find((item) => item.id === id);
   if (record) response.json(record);
   else {
-    response.statusMessage = 'Record not found';
+    response.statusMessage = "Record not found";
     response.status(404).send();
   }
-})
+});
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  phonebook = phonebook.filter(record => record.id !== id)
-  response.status(204).send()
-})
+  phonebook = phonebook.filter((record) => record.id !== id);
+  response.status(204).send();
+});
 
 app.get("/info", (request, response) => {
-  const date = new Date()  
+  const date = new Date();
   response.send(`\
     <p>Phonebook has info for ${phonebook.length} people</p>\
     <p>${date}</p>\
