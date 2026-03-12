@@ -24,6 +24,21 @@
       "id": "2da1",
       "name": "Hi There",
       "number": "0802"
+    },
+    {
+      "id": "bcab",
+      "name": "Test",
+      "number": "123456"
+    },
+    {
+      "id": "d7f5",
+      "name": "Tester",
+      "number": "512512512"
+    },
+    {
+      "id": "abf1",
+      "name": "More Test",
+      "number": "014190491"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

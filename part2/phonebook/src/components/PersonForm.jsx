@@ -1,6 +1,6 @@
 import personsService from "../services/persons";
 
-const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons }) => {
+const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons, setErrorMessage, setError }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (newName === '' || newNumber === '')
@@ -20,7 +20,12 @@ const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, set
 
 
         await personsService.addPerson(newName, newNumber)
-            .then((data) => setPersons(persons.concat(data)))
+            .then((data) => {
+                setPersons(persons.concat(data))
+                setError(false)
+                setErrorMessage(`Added ${newName}`)
+                setTimeout(() => setErrorMessage(null), 5000);
+            })
     }
 
     return (
