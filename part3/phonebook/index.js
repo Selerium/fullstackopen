@@ -25,7 +25,21 @@ let phonebook = [
   },
 ];
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+app.use(express.json())
+
 app.get("/api/persons", (request, response) => response.json(phonebook));
+
+app.post("/api/persons", (request, response) => {
+  const record = request.body
+  record['id'] = getRandomInt(1000000)
+  phonebook = phonebook.concat(record)
+
+  response.send(record)
+})
 
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
