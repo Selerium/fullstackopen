@@ -33,7 +33,7 @@ function App() {
          <img alt={filteredCountries[0].flags.alt} src={filteredCountries[0].flags.png} />
         </>
         : <>
-        {(filteredCountries.length > 0 && filteredCountries.length <= 10) && filteredCountries.map(country => <p key={country.name.common}>{country.name.common}</p>)}
+        {(filteredCountries.length > 0 && filteredCountries.length <= 10) && filteredCountries.map(country => <p key={country.name.common}>{country.name.common} <button onClick={() => setSearch(country.name.common)}>Show</button></p>)}
         {search && filteredCountries.length > 10 && <p>Too many matches, specify another filter</p>}
         </>
       }
