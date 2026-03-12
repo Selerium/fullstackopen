@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan")
 const app = express();
 const PORT = 3001;
 
@@ -29,6 +30,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+app.use(morgan("tiny"));
 app.use(express.json());
 
 app.get("/api/persons", (request, response) => response.json(phonebook));
@@ -38,14 +40,12 @@ app.post("/api/persons", (request, response) => {
 
   if (!record["name"] || !record["number"]) {
     response.json({ error: "incomplete fields sent" });
-  }
-  else if (phonebook.find((list) => list.name === record["name"])) {
+  } else if (phonebook.find((list) => list.name === record["name"])) {
     response.json({ error: "name must be a unique value" });
-  }
-  else {
+  } else {
     record["id"] = getRandomInt(1000000);
     phonebook = phonebook.concat(record);
-  
+
     response.send(record);
   }
 });
