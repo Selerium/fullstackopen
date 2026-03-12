@@ -37,7 +37,12 @@ const App = () => {
         setError={setError}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} setPersons={setPersons} />
+      <Persons
+        persons={filteredPersons}
+        setPersons={setPersons}
+        setError={setError}
+        setErrorMessage={setErrorMessage}
+      />
     </div>
   )
 }

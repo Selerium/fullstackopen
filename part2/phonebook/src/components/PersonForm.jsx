@@ -15,6 +15,12 @@ const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, set
                     const personsCopy = persons.filter(person => person.id !== data.id)
                     setPersons(personsCopy.concat(data))
                 })
+                .catch((error) => {
+                    setError(true)
+                    setErrorMessage(`Information of ${newName} has already been removed from server`)
+                    setPersons(persons.filter(newPerson => newPerson.name != newName))
+                    setTimeout(() => setErrorMessage(null), 5000);
+                })
             return;
         }
 
