@@ -1,5 +1,5 @@
 const express = require("express");
-const morgan = require("morgan")
+const morgan = require("morgan");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -30,6 +30,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+app.use(express.static("dist"));
 app.use(express.json());
 app.use((req, res, next) => {
   const oldJson = res.json;
@@ -40,11 +41,15 @@ app.use((req, res, next) => {
   };
 
   next();
-})
+});
 
-morgan.token('res-body', (req, res) => JSON.stringify(res.locals.body));
+morgan.token("res-body", (req, res) => JSON.stringify(res.locals.body));
 
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :res-body"));
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :res-body"
+  )
+);
 
 app.get("/api/persons", (request, response) => response.json(phonebook));
 
