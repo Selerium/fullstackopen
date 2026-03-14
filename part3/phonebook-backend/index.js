@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const Person = require("./models/person");
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -51,20 +53,29 @@ app.use(
   )
 );
 
-app.get("/api/persons", (request, response) => response.json(phonebook));
+app.get("/api/persons", (request, response) => {
+  Person.find({}).then((result) => {
+    response.json(result);
+  });
+});
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", async (request, response) => {
   const record = request.body;
 
   if (!record["name"] || !record["number"]) {
     response.json({ error: "incomplete fields sent" });
-  } else if (phonebook.find((list) => list.name === record["name"])) {
-    response.json({ error: "name must be a unique value" });
   } else {
-    record["id"] = getRandomInt(1000000);
-    phonebook = phonebook.concat(record);
+    const check = await Person.exists({ name: record["name"] });
+    if (!check) {
+      const newPerson = new Person({
+        name: record["name"],
+        number: record["number"],
+      });
 
-    response.send(record);
+      newPerson.save().then((result) => response.json(result));
+    } else {
+      response.status(400).json({ error: "duplicate name" });
+    }
   }
 });
 
@@ -73,8 +84,7 @@ app.get("/api/persons/:id", (request, response) => {
   const record = phonebook.find((item) => item.id === id);
   if (record) response.json(record);
   else {
-    response.statusMessage = "Record not found";
-    response.status(404).send();
+    response.status(404).json({ error: "record not found" });
   }
 });
 
