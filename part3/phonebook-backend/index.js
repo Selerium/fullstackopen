@@ -53,13 +53,15 @@ app.use(
   )
 );
 
-app.get("/api/persons", (request, response) => {
-  Person.find({}).then((result) => {
-    response.json(result);
-  });
+app.get("/api/persons", (request, response, next) => {
+  Person.find({})
+    .then((result) => {
+      response.json(result);
+    })
+    .catch((error) => next(error));
 });
 
-app.post("/api/persons", async (request, response) => {
+app.post("/api/persons", async (request, response, next) => {
   const record = request.body;
 
   if (!record["name"] || !record["number"]) {
@@ -72,34 +74,65 @@ app.post("/api/persons", async (request, response) => {
         number: record["number"],
       });
 
-      newPerson.save().then((result) => response.json(result));
+      newPerson
+        .save()
+        .then((result) => response.json(result))
+        .catch((error) => next(error));
     } else {
       response.status(400).json({ error: "duplicate name" });
     }
   }
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  const record = phonebook.find((item) => item.id === id);
-  if (record) response.json(record);
-  else {
-    response.status(404).json({ error: "record not found" });
+app.get("/api/persons/:id", async (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((record) => {
+      if (record) response.json(record);
+      else {
+        response.status(404).json({ error: "record not found" });
+      }
+    })
+    .catch((error) => next(error));
+});
+
+app.put("/api/persons/:id", async (request, response, next) => {
+  const record = request.body;
+
+  if (!record["name"] || !record["number"]) {
+    response.status(400).json({ error: "missing request fields" });
+  } else {
+    await Person.findByIdAndUpdate(request.params.id, request.body, {
+      new: true,
+    })
+      .then((result) => response.json(result))
+      .catch((error) => next(error));
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  phonebook = phonebook.filter((record) => record.id != id);
+app.delete("/api/persons/:id", async (request, response, next) => {
+  await Person.findByIdAndDelete(request.params.id).catch((error) =>
+    next(error)
+  );
   response.status(204).send();
 });
 
-app.get("/info", (request, response) => {
+app.get("/info", (request, response, next) => {
   const date = new Date();
   response.send(`\
     <p>Phonebook has info for ${phonebook.length} people</p>\
     <p>${date}</p>\
     `);
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError")
+    return response.status(400).send({ error: "incorrect request fields" });
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
