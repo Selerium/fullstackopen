@@ -49,8 +49,8 @@ morgan.token("res-body", (req, res) => JSON.stringify(res.locals.body));
 
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :res-body"
-  )
+    ":method :url :status :res[content-length] - :response-time ms :res-body",
+  ),
 );
 
 app.get("/api/persons", (request, response, next) => {
@@ -103,6 +103,7 @@ app.put("/api/persons/:id", async (request, response, next) => {
   } else {
     await Person.findByIdAndUpdate(request.params.id, request.body, {
       new: true,
+      runValidators: true,
     })
       .then((result) => response.json(result))
       .catch((error) => next(error));
@@ -111,7 +112,7 @@ app.put("/api/persons/:id", async (request, response, next) => {
 
 app.delete("/api/persons/:id", async (request, response, next) => {
   await Person.findByIdAndDelete(request.params.id).catch((error) =>
-    next(error)
+    next(error),
   );
   response.status(204).send();
 });
@@ -128,7 +129,9 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
   if (error.name === "CastError")
-    return response.status(400).send({ error: "incorrect request fields" });
+    return response.status(400).send({ error: "incorrect id" });
+  if (error.name === "ValidationError")
+    return response.status(400).send({ error: error.message });
 
   next(error);
 };
