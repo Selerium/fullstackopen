@@ -32,6 +32,11 @@ const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, persons, set
                 setErrorMessage(`Added ${newName}`)
                 setTimeout(() => setErrorMessage(null), 5000);
             })
+            .catch((error) => {
+                setError(true)
+                setErrorMessage(error.response.data.error)
+                setTimeout(() => setErrorMessage(null), 5000);
+            })
     }
 
     return (

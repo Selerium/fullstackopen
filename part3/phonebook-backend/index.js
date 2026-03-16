@@ -49,8 +49,8 @@ morgan.token("res-body", (req, res) => JSON.stringify(res.locals.body));
 
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :res-body",
-  ),
+    ":method :url :status :res[content-length] - :response-time ms :res-body"
+  )
 );
 
 app.get("/api/persons", (request, response, next) => {
@@ -112,15 +112,16 @@ app.put("/api/persons/:id", async (request, response, next) => {
 
 app.delete("/api/persons/:id", async (request, response, next) => {
   await Person.findByIdAndDelete(request.params.id).catch((error) =>
-    next(error),
+    next(error)
   );
   response.status(204).send();
 });
 
-app.get("/info", (request, response, next) => {
+app.get("/info", async (request, response, next) => {
   const date = new Date();
+  const info = await Person.countDocuments({});
   response.send(`\
-    <p>Phonebook has info for ${phonebook.length} people</p>\
+    <p>Phonebook has info for ${info} people</p>\
     <p>${date}</p>\
     `);
 });
