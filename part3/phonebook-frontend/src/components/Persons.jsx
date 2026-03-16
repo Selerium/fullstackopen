@@ -7,8 +7,8 @@ const Persons = ({ persons, setPersons, setError, setErrorMessage }) => {
             <button style={{ display: "inline" }} onClick={async () => {
                 if (window.confirm(`Delete ${person.name}?`)) {
                     await personsService.deletePerson(person.id)
-                        .then((success) => setPersons(persons.filter(newPerson => newPerson.id != person.id)))
-                        .catch((failure) => {
+                        .then(() => setPersons(persons.filter(newPerson => newPerson.id != person.id)))
+                        .catch(() => {
                             setError(true)
                             setErrorMessage(`Information of ${person.name} has already been removed from server`)
                             setPersons(persons.filter(newPerson => newPerson.id != person.id))

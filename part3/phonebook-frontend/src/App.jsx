@@ -7,16 +7,16 @@ import personsService from './services/persons'
 import Notification from './components/Notification'
 
 const App = () => {
-  useEffect(() => {
-    personsService.getPersons().then((data) => setPersons(data))
-  }, [])
-
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchFilter, setSearchFilter] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    personsService.getPersons().then((data) => setPersons(data))
+  }, [])
 
   const filteredPersons = searchFilter ? persons.filter(person => person.name.toLowerCase().includes(searchFilter.toLowerCase())) : persons
 
