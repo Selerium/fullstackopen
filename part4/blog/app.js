@@ -1,15 +1,20 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const blogRouter = require("./controllers/blog");
-require("dotenv").config();
+const { MONGODB_URI } = require("./utils/config");
+const errorHandler = require("./utils/middleware");
 
 const app = express();
+
+mongoose
+  .connect(MONGODB_URI, { family: 4 })
+  .then(() => console.log("connected to DB"))
+  .catch(() => console.error("DB failed to connect"));
+
 app.use(express.json());
 
-const db_password = process.env.MONGODB_PASS;
-const mongoUrl = `mongodb+srv://johnadithya008_db_user:${db_password}@fullstackopen.bxrwquz.mongodb.net/?appName=fullstackopen`;
-mongoose.connect(mongoUrl, { family: 4 });
+app.use("/api/blogs", blogRouter);
 
-app.use('/api/blogs/', blogRouter);
+app.use(errorHandler);
 
 module.exports = app;
