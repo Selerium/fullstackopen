@@ -1,9 +1,10 @@
 const supertest = require("supertest");
-const { describe, test, beforeEach, after } = require("node:test");
+const { describe, test, beforeEach, after, before } = require("node:test");
 const assert = require("node:assert");
 const app = require("../app");
 const Blog = require("../models/blog");
 const mongoose = require("mongoose");
+const User = require("../models/user");
 
 const initialData = [
   {
@@ -27,6 +28,21 @@ const initialData = [
 ];
 
 const api = supertest(app);
+let userToken;
+
+before(async () => {
+  await api
+    .post("/api/users")
+    .send({ username: "root", password: "root", name: "root" });
+
+  const userInfo = await api.post("/api/login").send({
+    username: "root",
+    password: "root",
+  });
+
+  userToken = userInfo.body.token;
+  console.log(userToken);
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -43,7 +59,7 @@ describe("verifying GET /api/blogs", () => {
     assert.strictEqual(initialData.length, result.body.length);
   });
 
-  test.only("contains ID field", async () => {
+  test("contains ID field", async () => {
     const result = await api.get("/api/blogs");
 
     assert.strictEqual(Object.hasOwn(result.body[0], "id"), true);
@@ -60,6 +76,7 @@ describe("verifying POST /api/blogs", () => {
         url: "testUrl",
         likes: 0,
       })
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
   });
@@ -72,6 +89,7 @@ describe("verifying POST /api/blogs", () => {
         author: "testAuthor",
         url: "testUrl",
       })
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
     assert.strictEqual(0, result.body["likes"]);
@@ -84,6 +102,7 @@ describe("verifying POST /api/blogs", () => {
         author: "testAuthor",
         url: "testUrl",
       })
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(400);
   });
 
@@ -94,6 +113,7 @@ describe("verifying POST /api/blogs", () => {
         title: "testTitle",
         author: "testAuthor",
       })
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(400);
   });
 });
@@ -104,15 +124,22 @@ describe("veryfing DELETE /api/blogs/id", () => {
 
     await api
       .delete(`/api/blogs/${result.body[0]["id"].toString()}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(200);
   });
 
   test("non existent ID", async () => {
-    await api.delete(`/api/blogs/69befe1173b42a0f197e5d3f`).expect(200);
+    await api
+      .delete(`/api/blogs/69befe1173b42a0f197e5d3f`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200);
   });
 
   test("invalid ID", async () => {
-    await api.delete(`/api/blogs/fakeid`).expect(400);
+    await api
+      .delete(`/api/blogs/fakeid`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(400);
   });
 });
 
@@ -139,13 +166,13 @@ describe("veryfing PUT /api/blogs/id", () => {
     assert.strictEqual(updated.body.likes, 67);
   });
 
-    test.only("non existent ID", async () => {
-      await api.put(`/api/blogs/69befe1173b42a0f197e5d3f`).expect(200);
-    });
+  test.only("non existent ID", async () => {
+    await api.put(`/api/blogs/69befe1173b42a0f197e5d3f`).expect(200);
+  });
 
-    test.only("invalid ID", async () => {
-      await api.delete(`/api/blogs/fakeid`).expect(400);
-    });
+  test.only("invalid ID", async () => {
+    await api.put(`/api/blogs/fakeid`).expect(400);
+  });
 });
 
 after(() => {
